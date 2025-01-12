@@ -5,47 +5,62 @@
 #include <deque>
 #include <optional>
 #include <unordered_map>
+#include <set>
 #include <string>
 #include <vector>
 
 namespace catalogue
 {
-	namespace storage
+	struct Stop
 	{
-		class TransportCatalogue
+		std::string stop_name;
+		Coordinates coords;
+	};
+
+	struct Bus
+	{
+		std::string bus_name;
+		std::vector<const Stop *> bus_stops;
+	};
+
+	struct BusInfo
+	{
+		int stops_count = 0;
+		int unique_stops = 0;
+		double route_length = 0.0;
+	};
+
+	namespace detail
+	{
+		struct BusPtrComparator
 		{
-		public:
-			void AddStop(std::string_view name, Coordinates coords);
-
-			std::optional<std::string> FindStop(std::string_view name) const;
-
-			void AddBus(std::string_view name, std::vector<std::string_view> routes);
-
-			std::optional<std::string> FindBus(std::string_view name) const;
-
-			void GetBusInfo(std::string_view name, std::ostream &output) const;
-
-			void GetStopInfo(std::string_view name, std::ostream &output) const;
-
-		private:
-			struct Stop
+			bool operator()(const Bus *left, const Bus *right) const
 			{
-				std::string stop_name;
-				Coordinates coords;
-				std::deque<int> buses;
-			};
-
-			struct Bus
-			{
-				std::string bus_name;
-				std::deque<Stop *> bus_stops;
-			};
-
-			std::deque<Stop> stops_;
-			std::unordered_map<int, Stop *> stopname_to_stop_;
-			std::deque<Bus> buses_;
-			std::unordered_map<int, Bus *> busname_to_bus_;
+				return left->bus_name < right->bus_name;
+			}
 		};
 	}
 
+	class TransportCatalogue
+	{
+	public:
+		void AddStop(const std::string &name, Coordinates coords);
+
+		const Stop *FindStop(std::string_view name) const;
+
+		void AddBus(const std::string &name, std::vector<std::string_view> routes);
+
+		const Bus *FindBus(std::string_view name) const;
+
+		BusInfo GetBusInfo(std::string_view name) const;
+
+		const std::set<const Bus *, detail::BusPtrComparator> *GetStopInfo(std::string_view name) const;
+
+	private:
+		std::deque<Stop> stops_;
+		std::unordered_map<std::string_view, const Stop *> stopname_to_stop_;
+		std::unordered_map<std::string_view, std::set<const Bus *, detail::BusPtrComparator>> stop_to_buses_;
+		std::deque<Bus> buses_;
+		std::unordered_map<std::string_view, const Bus *> busname_to_bus_;
+	};
 }

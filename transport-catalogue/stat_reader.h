@@ -9,7 +9,7 @@ namespace catalogue
 {
     namespace detail
     {
-        void ParseAndPrintStat(const storage::TransportCatalogue &tansport_catalogue, std::string_view request,
+        void ParseAndPrintStat(const TransportCatalogue &tansport_catalogue, std::string_view request,
                                std::ostream &output);
     }
 

@@ -11,7 +11,7 @@ namespace catalogue
      */
     namespace detail
     {
-        storage::Coordinates ParseCoordinates(std::string_view str)
+        Coordinates ParseCoordinates(std::string_view str)
         {
             static const double nan = std::nan("");
 
@@ -125,7 +125,7 @@ namespace catalogue
             }
         }
 
-        void InputReader::ApplyCommands([[maybe_unused]] storage::TransportCatalogue &catalogue) const
+        void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue &catalogue) const
         {
             for (auto &elem : commands_)
             {

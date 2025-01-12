@@ -39,7 +39,7 @@ namespace catalogue
             /**
              * Наполняет данными транспортный справочник, используя команды из commands_
              */
-            void ApplyCommands(storage::TransportCatalogue &catalogue) const;
+            void ApplyCommands(TransportCatalogue &catalogue) const;
 
         private:
             std::vector<CommandDescription> commands_;
