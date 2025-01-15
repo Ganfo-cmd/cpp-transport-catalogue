@@ -5,7 +5,7 @@
 #include <deque>
 #include <optional>
 #include <unordered_map>
-#include <set>
+#include <unordered_set>
 #include <string>
 #include <vector>
 
@@ -30,17 +30,6 @@ namespace catalogue
 		double route_length = 0.0;
 	};
 
-	namespace detail
-	{
-		struct BusPtrComparator
-		{
-			bool operator()(const Bus *left, const Bus *right) const
-			{
-				return left->bus_name < right->bus_name;
-			}
-		};
-	}
-
 	class TransportCatalogue
 	{
 	public:
@@ -48,18 +37,18 @@ namespace catalogue
 
 		const Stop *FindStop(std::string_view name) const;
 
-		void AddBus(const std::string &name, std::vector<std::string_view> routes);
+		void AddBus(const std::string &name, const std::vector<std::string_view> &routes);
 
 		const Bus *FindBus(std::string_view name) const;
 
 		BusInfo GetBusInfo(std::string_view name) const;
 
-		const std::set<const Bus *, detail::BusPtrComparator> *GetStopInfo(std::string_view name) const;
+		const std::unordered_set<const Bus *> *GetStopInfo(std::string_view name) const;
 
 	private:
 		std::deque<Stop> stops_;
 		std::unordered_map<std::string_view, const Stop *> stopname_to_stop_;
-		std::unordered_map<std::string_view, std::set<const Bus *, detail::BusPtrComparator>> stop_to_buses_;
+		std::unordered_map<std::string_view, std::unordered_set<const Bus *>> bus_by_name_;
 		std::deque<Bus> buses_;
 		std::unordered_map<std::string_view, const Bus *> busname_to_bus_;
 	};
