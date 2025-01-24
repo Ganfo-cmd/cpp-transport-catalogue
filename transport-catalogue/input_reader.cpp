@@ -112,6 +112,35 @@ namespace catalogue
                     std::string(line.substr(not_space, colon_pos - not_space)),
                     std::string(line.substr(colon_pos + 1))};
         }
+
+        std::vector<std::pair<double, std::string_view>> ParseDistance(std::string_view line)
+        {
+            std::vector<std::pair<double, std::string_view>> result;
+            auto comma = line.find(',', line.find(',') + 1);
+
+            while (comma < line.size())
+            {
+                auto not_space = line.find_first_not_of(' ', comma + 1);
+                auto not_space2 = line.find('m', not_space);
+
+                double distance = std::stod(std::string(line.substr(not_space, not_space2 - not_space)));
+
+                not_space = line.find_first_not_of(' ', not_space2 + 1);
+                not_space = line.find_first_not_of(' ', not_space + 2);
+
+                if ((comma = line.find(',', not_space)) > line.size())
+                {
+                    result.push_back({distance, Trim(line.substr(not_space))});
+                }
+                else
+                {
+                    not_space2 = line.find_last_not_of(' ', comma - 1);
+                    result.push_back({distance, line.substr(not_space, not_space2 - not_space + 1)});
+                }
+            }
+
+            return result;
+        }
     }
 
     namespace reader
@@ -132,6 +161,14 @@ namespace catalogue
                 if (elem && elem.command == "Stop")
                 {
                     catalogue.AddStop(elem.id, detail::ParseCoordinates(elem.description));
+                }
+            }
+
+            for (auto &elem : commands_)
+            {
+                if (elem && elem.command == "Stop")
+                {
+                    catalogue.SetDistance(elem.id, detail::ParseDistance(elem.description));
                 }
             }
 

@@ -22,7 +22,8 @@ namespace catalogue
             {
                 output << "Bus " << id << ": " << bus_info.stops_count << " stops on route, "
                        << bus_info.unique_stops << " unique stops, "
-                       << std::setprecision(6) << bus_info.route_length << " route length" << std::endl;
+                       << std::setprecision(6) << bus_info.route_length << " route length, "
+                       << bus_info.curvature << " curvature" << std::endl;
             }
             else
             {
@@ -41,17 +42,17 @@ namespace catalogue
         void PrintStopStat(const TransportCatalogue &transport_catalogue, std::string_view id, std::ostream &output)
         {
             const auto buses = transport_catalogue.GetStopInfo(id);
-            if (buses != nullptr)
+            if (transport_catalogue.FindStop(id))
             {
                 output << "Stop " << id;
-                if ((*buses).size() == 0)
+                if (buses.size() == 0)
                 {
                     output << ": no buses" << std::endl;
                 }
                 else
                 {
                     output << ": buses";
-                    const std::set<const Bus *, BusPtrComparator> sorted_buses(buses->begin(), buses->end());
+                    const std::set<const Bus *, BusPtrComparator> sorted_buses(buses.begin(), buses.end());
                     for (const auto bus : sorted_buses)
                     {
                         output << " " << bus->bus_name;

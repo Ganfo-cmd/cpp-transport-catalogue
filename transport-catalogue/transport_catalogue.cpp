@@ -4,12 +4,11 @@
 
 namespace catalogue
 {
-
     void TransportCatalogue::AddStop(const std::string &name, Coordinates coords)
     {
         stops_.push_back({name, coords});
         stopname_to_stop_.insert({stops_.back().stop_name, &stops_.back()});
-        bus_by_name_[stops_.back().stop_name];
+        buses_by_stopname_[stops_.back().stop_name];
     }
 
     const Stop *TransportCatalogue::FindStop(std::string_view name) const
@@ -35,7 +34,7 @@ namespace catalogue
 
         for (const auto &stop : stops)
         {
-            bus_by_name_.at(stop).insert(&buses_.back());
+            buses_by_stopname_.at(stop).insert(&buses_.back());
         }
     }
 
@@ -45,6 +44,26 @@ namespace catalogue
         if (it == busname_to_bus_.end())
         {
             return nullptr;
+        }
+        return it->second;
+    }
+
+    void TransportCatalogue::SetDistance(const std::string &name, const std::vector<std::pair<double, std::string_view>> &other_stops)
+    {
+        const auto from = FindStop(name);
+        for (const auto &[distance, stop] : other_stops)
+        {
+            const auto to = FindStop(stop);
+            distances_by_stops_[{from, to}] = distance;
+        }
+    }
+
+    double TransportCatalogue::GetDistance(const Stop *stop, const Stop *other_stop) const
+    {
+        const auto it = distances_by_stops_.find({stop, other_stop});
+        if (it == distances_by_stops_.end())
+        {
+            return distances_by_stops_.at({other_stop, stop});
         }
         return it->second;
     }
@@ -67,25 +86,34 @@ namespace catalogue
         }
         bus_info.unique_stops = unique_stop.size();
 
-        double loc_route_length = 0;
+        double loc_route_geo_length = 0.0;
+        double loc_route_coord_length = 0.0;
         for (auto iter = bus_stops.begin(); iter != std::prev(bus_stops.end());)
         {
             const auto other_iter = iter;
             ++iter;
-            loc_route_length += ComputeDistance((*other_iter)->coords, (*iter)->coords);
+
+            loc_route_coord_length += ComputeDistance((*other_iter)->coords, (*iter)->coords);
+
+            loc_route_geo_length += GetDistance(*other_iter, *iter);
         }
-        bus_info.route_length = loc_route_length;
+
+        bus_info.route_length = loc_route_geo_length;
+        bus_info.curvature = loc_route_geo_length / loc_route_coord_length;
 
         return bus_info;
     }
 
-    const std::unordered_set<const Bus *> *TransportCatalogue::GetStopInfo(std::string_view name) const
+    const std::unordered_set<const Bus *> &TransportCatalogue::GetStopInfo(std::string_view name) const
     {
-        if (FindStop(name) != nullptr)
+        static const std::unordered_set<const Bus *> empty;
+
+        const auto it = buses_by_stopname_.find(name);
+        if (it != buses_by_stopname_.end())
         {
-            return &(bus_by_name_.at(name));
+            return it->second;
         }
 
-        return nullptr;
+        return empty;
     }
 }
