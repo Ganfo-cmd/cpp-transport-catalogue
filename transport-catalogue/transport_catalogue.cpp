@@ -48,17 +48,14 @@ namespace catalogue
         return it->second;
     }
 
-    void TransportCatalogue::SetDistance(const std::string &name, const std::vector<std::pair<double, std::string_view>> &other_stops)
+    void TransportCatalogue::SetDistance(const std::string &stop_name, std::string_view other_stop, const int distance)
     {
-        const auto from = FindStop(name);
-        for (const auto &[distance, stop] : other_stops)
-        {
-            const auto to = FindStop(stop);
-            distances_by_stops_[{from, to}] = distance;
-        }
+        const auto from = FindStop(stop_name);
+        const auto to = FindStop(other_stop);
+        distances_by_stops_[{from, to}] = distance;
     }
 
-    double TransportCatalogue::GetDistance(const Stop *stop, const Stop *other_stop) const
+    int TransportCatalogue::GetDistance(const Stop *stop, const Stop *other_stop) const
     {
         const auto it = distances_by_stops_.find({stop, other_stop});
         if (it == distances_by_stops_.end())

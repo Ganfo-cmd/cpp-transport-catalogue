@@ -168,7 +168,10 @@ namespace catalogue
             {
                 if (elem && elem.command == "Stop")
                 {
-                    catalogue.SetDistance(elem.id, detail::ParseDistance(elem.description));
+                    for (const auto &[distance, stop] : detail::ParseDistance(elem.description))
+                    {
+                        catalogue.SetDistance(elem.id, stop, distance);
+                    }
                 }
             }
 

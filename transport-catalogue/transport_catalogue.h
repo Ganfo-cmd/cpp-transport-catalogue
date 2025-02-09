@@ -42,9 +42,9 @@ namespace catalogue
 
 		const Bus *FindBus(std::string_view name) const;
 
-		void SetDistance(const std::string &name, const std::vector<std::pair<double, std::string_view>> &other_stops);
+		void SetDistance(const std::string &stop_name, std::string_view other_stop, const int distance);
 
-		double GetDistance(const Stop *, const Stop *) const;
+		int GetDistance(const Stop *, const Stop *) const;
 
 		BusInfo GetBusInfo(std::string_view name) const;
 
@@ -61,7 +61,7 @@ namespace catalogue
 
 		std::deque<Stop> stops_;
 		std::unordered_map<std::string_view, const Stop *> stopname_to_stop_;
-		std::unordered_map<std::pair<const Stop *, const Stop *>, double, StopPtrHasher> distances_by_stops_;
+		std::unordered_map<std::pair<const Stop *, const Stop *>, int, StopPtrHasher> distances_by_stops_;
 		std::unordered_map<std::string_view, std::unordered_set<const Bus *>> buses_by_stopname_;
 		std::deque<Bus> buses_;
 		std::unordered_map<std::string_view, const Bus *> busname_to_bus_;
