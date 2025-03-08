@@ -1,32 +1,26 @@
 #include <iostream>
 #include <string>
+#include <vector>
 
-#include "input_reader.h"
-#include "stat_reader.h"
+#include "json_reader.h"
+#include "map_renderer.h"
+#include "request_handler.h"
 
 using namespace std;
+using namespace catalogue;
+using namespace catalogue::json;
+using namespace catalogue::renderer;
 
-int main() {
-    catalogue::TransportCatalogue catalogue;
+int main()
+{
+    Document doc;
+    TransportCatalogue catalogue;
+    RenderSettings rend_sett;
+    std::vector<StatRequests> stat_requests;
 
-    int base_request_count;
-    cin >> base_request_count >> ws;
+    doc = Load(std::cin);
+    ParseRequests(doc, catalogue, stat_requests, rend_sett);
 
-    {
-        catalogue::reader::InputReader reader;
-        for (int i = 0; i < base_request_count; ++i) {
-            string line;
-            getline(cin, line);
-            reader.ParseLine(line);
-        }
-        reader.ApplyCommands(catalogue);
-    }
-
-    int stat_request_count;
-    cin >> stat_request_count >> ws;
-    for (int i = 0; i < stat_request_count; ++i) {
-        string line;
-        getline(cin, line);
-        catalogue::detail::ParseAndPrintStat(catalogue, line, cout);
-    }
+    Document output = GetOutputDocument(catalogue, stat_requests, rend_sett);
+    Print(output, std::cout);
 }

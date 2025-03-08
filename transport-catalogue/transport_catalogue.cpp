@@ -4,7 +4,7 @@
 
 namespace catalogue
 {
-    void TransportCatalogue::AddStop(const std::string &name, Coordinates coords)
+    void TransportCatalogue::AddStop(const std::string &name, geo::Coordinates coords)
     {
         stops_.push_back({name, coords});
         stopname_to_stop_.insert({stops_.back().stop_name, &stops_.back()});
@@ -21,7 +21,7 @@ namespace catalogue
         return it->second;
     }
 
-    void TransportCatalogue::AddBus(const std::string &name, const std::vector<std::string_view> &stops)
+    void TransportCatalogue::AddBus(const std::string &name, const std::vector<std::string_view> &stops, bool is_roundtrip)
     {
         std::vector<const Stop *> bus_stops;
         for (const auto &stop : stops)
@@ -29,7 +29,7 @@ namespace catalogue
             bus_stops.push_back(stopname_to_stop_.at(stop));
         }
 
-        buses_.push_back({name, move(bus_stops)});
+        buses_.push_back({name, move(bus_stops), is_roundtrip});
         busname_to_bus_.insert({buses_.back().bus_name, &buses_.back()});
 
         for (const auto &stop : stops)
@@ -48,7 +48,7 @@ namespace catalogue
         return it->second;
     }
 
-    void TransportCatalogue::SetDistance(const std::string &stop_name, std::string_view other_stop, const int distance)
+    void TransportCatalogue::SetDistance(std::string_view stop_name, std::string_view other_stop, int distance)
     {
         const auto from = FindStop(stop_name);
         const auto to = FindStop(other_stop);
@@ -112,5 +112,15 @@ namespace catalogue
         }
 
         return empty;
+    }
+
+    const std::deque<Bus> &TransportCatalogue::GetBusList() const
+    {
+        return buses_;
+    }
+
+    const std::deque<Stop> &TransportCatalogue::GetStopList() const
+    {
+        return stops_;
     }
 }
