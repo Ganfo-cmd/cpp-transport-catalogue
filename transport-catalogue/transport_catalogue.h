@@ -28,6 +28,8 @@ namespace catalogue
 
 		const std::unordered_set<const Bus *> &GetStopInfo(std::string_view name) const;
 
+		const std::unordered_map<std::string_view, const Bus *> &GetBusNameToBus() const;
+
 		const std::deque<Bus> &GetBusList() const;
 
 		const std::deque<Stop> &GetStopList() const;

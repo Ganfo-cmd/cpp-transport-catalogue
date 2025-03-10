@@ -91,6 +91,108 @@ namespace catalogue
             stop_label.SetStrokeLineJoin(svg::StrokeLineJoin::ROUND);
         }
 
+        void MapRenderer::RenderBusRoutes(svg::Document &doc, const SphereProjector &proj, const std::vector<std::string_view> &buses, const std::unordered_map<std::string_view, const Bus *> &busname_to_bus) const
+        {
+            std::vector<geo::Coordinates> stops_coordinates;
+            int index = 0;
+            for (const auto &bus : buses)
+            {
+
+                for (const auto &stop : busname_to_bus.at(bus)->bus_stops)
+                {
+                    double lat = stop->coords.lat;
+                    double lng = stop->coords.lng;
+                    stops_coordinates.push_back({lat, lng});
+                }
+
+                if (stops_coordinates.empty())
+                {
+                    continue;
+                }
+
+                svg::Polyline route;
+                for (const auto &coord : stops_coordinates)
+                {
+                    const svg::Point screen_coord = proj(coord);
+                    route.AddPoint(screen_coord);
+                }
+
+                SetRouteProperties(route, index);
+                ++index;
+
+                doc.Add(route);
+                stops_coordinates.clear();
+            }
+        }
+
+        void MapRenderer::RenderRoutesName(svg::Document &doc, const SphereProjector &proj, const std::vector<std::string_view> &buses, const std::unordered_map<std::string_view, const Bus *> &busname_to_bus) const
+        {
+            int index = 0;
+            for (const auto &bus : buses)
+            {
+                const auto &bus_info = busname_to_bus.at(bus);
+                const bool is_roundtrip = bus_info->is_roundtrip;
+                const auto &bus_stops = bus_info->bus_stops;
+                if (bus_stops.empty())
+                {
+                    continue;
+                }
+
+                svg::Text route_label;
+                svg::Text route_text;
+
+                const svg::Point screen_coord = proj(bus_stops[0]->coords);
+                SetRouteNameProperties(route_label, route_text, screen_coord, bus, index);
+
+                doc.Add(route_label);
+                doc.Add(route_text);
+
+                if (!is_roundtrip && bus_stops[0] != bus_stops[bus_stops.size() / 2])
+                {
+                    svg::Text second_route_label;
+                    svg::Text second_route_text;
+
+                    const svg::Point sec_screen_coord = proj(bus_stops[bus_stops.size() / 2]->coords);
+                    SetRouteNameProperties(second_route_label, second_route_text, sec_screen_coord, bus, index);
+
+                    doc.Add(second_route_label);
+                    doc.Add(second_route_text);
+                }
+                ++index;
+            }
+        }
+
+        void MapRenderer::RenderStopCircle(svg::Document &doc, const SphereProjector &proj, const std::map<std::string_view, geo::Coordinates> &stops) const
+        {
+
+            for (const auto &[stop_name, coord] : stops)
+            {
+                svg::Circle stop_icon;
+                stop_icon.SetCenter(proj(coord));
+                SetStopIconProperties(stop_icon);
+
+                doc.Add(stop_icon);
+            }
+        }
+
+        void MapRenderer::RenderStopName(svg::Document &doc, const SphereProjector &proj, const std::map<std::string_view, geo::Coordinates> &stops) const
+        {
+            for (const auto &[stop_name, coord] : stops)
+            {
+                svg::Text stop_label;
+                svg::Text stop_text;
+
+                const svg::Point screen_coord = proj(coord);
+                stop_label.SetPosition(screen_coord);
+                stop_text.SetPosition(screen_coord);
+
+                SetStopNameProperties(stop_label, stop_text, stop_name);
+
+                doc.Add(stop_label);
+                doc.Add(stop_text);
+            }
+        }
+
         SphereProjector MapRenderer::GetSphereProjector(const std::vector<geo::Coordinates> &stops_coordinates) const
         {
             return SphereProjector{stops_coordinates.begin(), stops_coordinates.end(),

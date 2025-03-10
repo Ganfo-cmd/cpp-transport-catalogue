@@ -22,20 +22,12 @@ namespace catalogue
             using runtime_error::runtime_error;
         };
 
-        class Node
+        class Node : std::variant<std::nullptr_t, int, double, bool, std::string, Array, Dict>
         {
         public:
             /* Реализуйте Node, используя std::variant */
-            using Value = std::variant<std::nullptr_t, int, double, bool, std::string, Array, Dict>;
-
-            Node() = default;
-            Node(std::nullptr_t);
-            Node(int value);
-            Node(double value);
-            Node(bool value);
-            Node(std::string value);
-            Node(Array value);
-            Node(Dict value);
+            using variant::variant;
+            using Value = variant;
 
             bool operator==(const Node &rhs) const;
             bool operator!=(const Node &rhs) const;
@@ -58,9 +50,6 @@ namespace catalogue
             const Dict &AsMap() const;
 
             const Value &GetValue() const;
-
-        private:
-            Value value_;
         };
 
         class Document

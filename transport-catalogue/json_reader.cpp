@@ -59,6 +59,33 @@ namespace catalogue
             }
         }
 
+        svg::Color ParseColor(const Node &node)
+        {
+            if (node.IsString())
+            {
+                return node.AsString();
+            }
+            else if (node.IsArray())
+            {
+                const auto &und_color_arr = node.AsArray();
+                uint8_t red = und_color_arr[0].AsInt();
+                uint8_t green = und_color_arr[1].AsInt();
+                uint8_t blue = und_color_arr[2].AsInt();
+
+                if (und_color_arr.size() == 3)
+                {
+
+                    return svg::Color{svg::Rgb{red, green, blue}};
+                }
+                else
+                {
+                    double opacity = und_color_arr[3].AsDouble();
+                    return svg::Color{svg::Rgba{red, green, blue, opacity}};
+                }
+            }
+            return svg::Color();
+        }
+
         void ParseRenderSettings(const Node &node, renderer::RenderSettings &rend_sett)
         {
             if (!node.IsMap())
@@ -83,53 +110,12 @@ namespace catalogue
             rend_sett.stop_label_offset = std::make_pair(stop_label_offset[0].AsDouble(), stop_label_offset[1].AsDouble());
 
             rend_sett.underlayer_width = dictionary.at("underlayer_width").AsDouble();
-            const auto &und_color = dictionary.at("underlayer_color");
-            if (und_color.IsString())
-            {
-                rend_sett.underlayer_color = und_color.AsString();
-            }
-            else if (und_color.IsArray())
-            {
-                const auto &und_color_arr = und_color.AsArray();
-                uint8_t red = und_color_arr[0].AsInt();
-                uint8_t green = und_color_arr[1].AsInt();
-                uint8_t blue = und_color_arr[2].AsInt();
-
-                if (und_color_arr.size() == 3)
-                {
-
-                    rend_sett.underlayer_color = std::move(svg::Color{svg::Rgb{red, green, blue}});
-                }
-                else
-                {
-                    double opacity = und_color_arr[3].AsDouble();
-                    rend_sett.underlayer_color = std::move(svg::Color{svg::Rgba{red, green, blue, opacity}});
-                }
-            }
+            rend_sett.underlayer_color = std::move(ParseColor(dictionary.at("underlayer_color")));
 
             std::vector<svg::Color> &color_pal = rend_sett.color_palette;
             for (const auto &color : dictionary.at("color_palette").AsArray())
             {
-                if (color.IsString())
-                {
-                    color_pal.push_back(color.AsString());
-                }
-                else if (color.IsArray())
-                {
-                    const auto &color_arr = color.AsArray();
-                    uint8_t red = color_arr[0].AsInt();
-                    uint8_t green = color_arr[1].AsInt();
-                    uint8_t blue = color_arr[2].AsInt();
-                    if (color_arr.size() == 3)
-                    {
-                        color_pal.push_back(svg::Rgb{red, green, blue});
-                    }
-                    else
-                    {
-                        double opacity = color_arr[3].AsDouble();
-                        color_pal.push_back(svg::Rgba{red, green, blue, opacity});
-                    }
-                }
+                color_pal.push_back(std::move(ParseColor(color)));
             }
         }
 

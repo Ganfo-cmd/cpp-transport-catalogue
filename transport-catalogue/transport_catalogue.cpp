@@ -114,6 +114,11 @@ namespace catalogue
         return empty;
     }
 
+    const std::unordered_map<std::string_view, const Bus *> &TransportCatalogue::GetBusNameToBus() const
+    {
+        return busname_to_bus_;
+    }
+
     const std::deque<Bus> &TransportCatalogue::GetBusList() const
     {
         return buses_;

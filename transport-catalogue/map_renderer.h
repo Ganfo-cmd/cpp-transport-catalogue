@@ -5,6 +5,8 @@
 #include "svg.h"
 
 #include <algorithm>
+#include <map>
+#include <unordered_map>
 
 namespace catalogue
 {
@@ -69,6 +71,14 @@ namespace catalogue
             void SetStopIconProperties(svg::Circle &stop_icon) const;
 
             void SetStopNameProperties(svg::Text &stop_label, svg::Text &stop_text, std::string_view stop_name) const;
+
+            void RenderBusRoutes(svg::Document &doc, const SphereProjector &proj, const std::vector<std::string_view> &buses, const std::unordered_map<std::string_view, const Bus *> &busname_to_bus) const;
+
+            void RenderRoutesName(svg::Document &doc, const SphereProjector &proj, const std::vector<std::string_view> &buses, const std::unordered_map<std::string_view, const Bus *> &busname_to_bus) const;
+
+            void RenderStopCircle(svg::Document &doc, const SphereProjector &proj, const std::map<std::string_view, geo::Coordinates> &stops) const;
+
+            void RenderStopName(svg::Document &doc, const SphereProjector &proj, const std::map<std::string_view, geo::Coordinates> &stops) const;
 
             SphereProjector GetSphereProjector(const std::vector<geo::Coordinates> &stops_coordinates) const;
 

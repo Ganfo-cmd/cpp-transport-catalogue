@@ -26,6 +26,8 @@ namespace catalogue
 
         void ParseRenderSettings(const Node &node, renderer::RenderSettings &rend_sett);
 
+        svg::Color ParseColor(const Node &node);
+
         Document GetOutputDocument(TransportCatalogue &catalogue, std::vector<StatRequests> &stat_requests, renderer::RenderSettings &rend_sett);
     }
 }

@@ -286,14 +286,6 @@ namespace catalogue
 
         //------------Node------------
 
-        Node::Node(std::nullptr_t) : value_() {}
-        Node::Node(int value) : value_(value) {}
-        Node::Node(double value) : value_(value) {}
-        Node::Node(bool value) : value_(value) {}
-        Node::Node(std::string value) : value_(value) {}
-        Node::Node(Array value) : value_(value) {}
-        Node::Node(Dict value) : value_(value) {}
-
         bool Node::operator==(const Node &rhs) const
         {
             return GetValue() == rhs.GetValue();
@@ -306,14 +298,12 @@ namespace catalogue
 
         bool Node::IsInt() const
         {
-            const auto *ptr = std::get_if<int>(&value_);
-            return ptr != nullptr;
+            return std::holds_alternative<int>(*this);
         }
 
         bool Node::IsPureDouble() const
         {
-            const auto *ptr = std::get_if<double>(&value_);
-            return ptr != nullptr;
+            return std::holds_alternative<double>(*this);
         }
 
         bool Node::IsDouble() const
@@ -323,39 +313,34 @@ namespace catalogue
 
         bool Node::IsBool() const
         {
-            const auto *ptr = std::get_if<bool>(&value_);
-            return ptr != nullptr;
+            return std::holds_alternative<bool>(*this);
         }
 
         bool Node::IsString() const
         {
-            const auto *ptr = std::get_if<std::string>(&value_);
-            return ptr != nullptr;
+            return std::holds_alternative<std::string>(*this);
         }
 
         bool Node::IsNull() const
         {
-            const auto *ptr = std::get_if<std::nullptr_t>(&value_);
-            return ptr != nullptr;
+            return std::holds_alternative<std::nullptr_t>(*this);
         }
 
         bool Node::IsArray() const
         {
-            const auto *ptr = std::get_if<Array>(&value_);
-            return ptr != nullptr;
+            return std::holds_alternative<Array>(*this);
         }
 
         bool Node::IsMap() const
         {
-            const auto *ptr = std::get_if<Dict>(&value_);
-            return ptr != nullptr;
+            return std::holds_alternative<Dict>(*this);
         }
 
         int Node::AsInt() const
         {
             if (IsInt())
             {
-                return std::get<int>(value_);
+                return std::get<int>(*this);
             }
             throw std::logic_error("logic error");
         }
@@ -364,7 +349,7 @@ namespace catalogue
         {
             if (IsBool())
             {
-                return std::get<bool>(value_);
+                return std::get<bool>(*this);
             }
             throw std::logic_error("logic error");
         }
@@ -373,7 +358,7 @@ namespace catalogue
         {
             if (IsDouble())
             {
-                return IsInt() ? std::get<int>(value_) : std::get<double>(value_);
+                return IsInt() ? std::get<int>(*this) : std::get<double>(*this);
             }
 
             throw std::logic_error("logic error");
@@ -383,7 +368,7 @@ namespace catalogue
         {
             if (IsString())
             {
-                return std::get<std::string>(value_);
+                return std::get<std::string>(*this);
             }
             throw std::logic_error("logic error");
         }
@@ -392,7 +377,7 @@ namespace catalogue
         {
             if (IsArray())
             {
-                return std::get<Array>(value_);
+                return std::get<Array>(*this);
             }
             throw std::logic_error("logic error");
         }
@@ -401,14 +386,14 @@ namespace catalogue
         {
             if (IsMap())
             {
-                return std::get<Dict>(value_);
+                return std::get<Dict>(*this);
             }
             throw std::logic_error("logic error");
         }
 
         const Node::Value &Node::GetValue() const
         {
-            return value_;
+            return *this;
         }
 
         //------------Document------------
