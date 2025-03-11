@@ -136,27 +136,22 @@ namespace catalogue
                 {
                     if (it == end)
                     {
-                        // Поток закончился до того, как встретили закрывающую кавычку?
                         throw ParsingError("String parsing error");
                     }
                     const char ch = *it;
                     if (ch == '"')
                     {
-                        // Встретили закрывающую кавычку
                         ++it;
                         break;
                     }
                     else if (ch == '\\')
                     {
-                        // Встретили начало escape-последовательности
                         ++it;
                         if (it == end)
                         {
-                            // Поток завершился сразу после символа обратной косой черты
                             throw ParsingError("String parsing error");
                         }
                         const char escaped_char = *(it);
-                        // Обрабатываем одну из последовательностей: \\, \n, \t, \r, \"
                         switch (escaped_char)
                         {
                         case 'n':
@@ -175,18 +170,15 @@ namespace catalogue
                             s.push_back('\\');
                             break;
                         default:
-                            // Встретили неизвестную escape-последовательность
                             throw ParsingError("Unrecognized escape sequence \\"s + escaped_char);
                         }
                     }
                     else if (ch == '\n' || ch == '\r')
                     {
-                        // Строковый литерал внутри- JSON не может прерываться символами \r или \n
                         throw ParsingError("Unexpected end of line"s);
                     }
                     else
                     {
-                        // Просто считываем очередной символ и помещаем его в результирующую строку
                         s.push_back(ch);
                     }
                     ++it;
@@ -285,6 +277,8 @@ namespace catalogue
         } // namespace
 
         //------------Node------------
+
+        Node::Node(Value value) : variant(std::move(value)) {}
 
         bool Node::operator==(const Node &rhs) const
         {
@@ -392,6 +386,11 @@ namespace catalogue
         }
 
         const Node::Value &Node::GetValue() const
+        {
+            return *this;
+        }
+
+        Node::Value &Node::GetValue()
         {
             return *this;
         }

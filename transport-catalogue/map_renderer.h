@@ -80,6 +80,8 @@ namespace catalogue
 
             void RenderStopName(svg::Document &doc, const SphereProjector &proj, const std::map<std::string_view, geo::Coordinates> &stops) const;
 
+            svg::Document RenderMap(const std::vector<geo::Coordinates> &stop_coords, const std::vector<std::string_view> &buses, const std::unordered_map<std::string_view, const Bus *> &busname_to_bus, const std::map<std::string_view, geo::Coordinates> &stops) const;
+
             SphereProjector GetSphereProjector(const std::vector<geo::Coordinates> &stops_coordinates) const;
 
         private:

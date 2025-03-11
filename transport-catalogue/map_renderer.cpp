@@ -193,6 +193,18 @@ namespace catalogue
             }
         }
 
+        svg::Document MapRenderer::RenderMap(const std::vector<geo::Coordinates> &stop_coords, const std::vector<std::string_view> &buses, const std::unordered_map<std::string_view, const Bus *> &busname_to_bus, const std::map<std::string_view, geo::Coordinates> &stops) const
+        {
+            svg::Document result;
+            const auto &proj = GetSphereProjector(stop_coords);
+            RenderBusRoutes(result, proj, buses, busname_to_bus);
+            RenderRoutesName(result, proj, buses, busname_to_bus);
+            RenderStopCircle(result, proj, stops);
+            RenderStopName(result, proj, stops);
+
+            return result;
+        }
+
         SphereProjector MapRenderer::GetSphereProjector(const std::vector<geo::Coordinates> &stops_coordinates) const
         {
             return SphereProjector{stops_coordinates.begin(), stops_coordinates.end(),

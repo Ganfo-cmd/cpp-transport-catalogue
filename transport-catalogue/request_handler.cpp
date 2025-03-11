@@ -23,8 +23,6 @@ namespace catalogue
             }
         }
 
-        const renderer::SphereProjector proj = renderer_.GetSphereProjector(stop_coords);
-
         std::vector<std::string_view> buses;
         const std::unordered_map<std::string_view, const Bus *> &busname_to_bus = db_.GetBusNameToBus();
         for (const auto &bus : db_.GetBusList())
@@ -35,10 +33,7 @@ namespace catalogue
 
         if (!buses.empty())
         {
-            renderer_.RenderBusRoutes(result, proj, buses, busname_to_bus);
-            renderer_.RenderRoutesName(result, proj, buses, busname_to_bus);
-            renderer_.RenderStopCircle(result, proj, stops);
-            renderer_.RenderStopName(result, proj, stops);
+            result = renderer_.RenderMap(stop_coords, buses, busname_to_bus, stops);
         }
 
         return result;

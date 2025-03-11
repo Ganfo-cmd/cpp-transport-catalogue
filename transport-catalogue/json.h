@@ -11,23 +11,22 @@ namespace catalogue
     {
 
         class Node;
-        // Сохраните объявления Dict и Array без изменения
         using Dict = std::map<std::string, Node>;
         using Array = std::vector<Node>;
 
-        // Эта ошибка должна выбрасываться при ошибках парсинга JSON
         class ParsingError : public std::runtime_error
         {
         public:
             using runtime_error::runtime_error;
         };
 
-        class Node : std::variant<std::nullptr_t, int, double, bool, std::string, Array, Dict>
+        class Node final : std::variant<std::nullptr_t, int, double, bool, std::string, Array, Dict>
         {
         public:
-            /* Реализуйте Node, используя std::variant */
             using variant::variant;
             using Value = variant;
+
+            Node(Value value);
 
             bool operator==(const Node &rhs) const;
             bool operator!=(const Node &rhs) const;
@@ -50,6 +49,8 @@ namespace catalogue
             const Dict &AsMap() const;
 
             const Value &GetValue() const;
+
+            Value &GetValue();
         };
 
         class Document
@@ -72,5 +73,4 @@ namespace catalogue
         void Print(const Document &doc, std::ostream &output);
 
     } // namespace json
-
 } // namespace catalogue
