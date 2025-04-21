@@ -57,12 +57,18 @@ namespace catalogue
 
     int TransportCatalogue::GetDistance(const Stop *stop, const Stop *other_stop) const
     {
-        const auto it = distances_by_stops_.find({stop, other_stop});
-        if (it == distances_by_stops_.end())
+        if (distances_by_stops_.count({stop, other_stop}))
+        {
+            return distances_by_stops_.at({stop, other_stop});
+        }
+        else if (distances_by_stops_.count({other_stop, stop}))
         {
             return distances_by_stops_.at({other_stop, stop});
         }
-        return it->second;
+        else
+        {
+            return 0;
+        }
     }
 
     BusInfo TransportCatalogue::GetBusInfo(std::string_view name) const
@@ -127,5 +133,10 @@ namespace catalogue
     const std::deque<Stop> &TransportCatalogue::GetStopList() const
     {
         return stops_;
+    }
+
+    int TransportCatalogue::GetStopCount() const
+    {
+        return stops_.size();
     }
 }

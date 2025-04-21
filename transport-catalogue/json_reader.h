@@ -14,11 +14,13 @@ namespace catalogue
             int id;
             std::string type;
             std::string name;
+            std::string from;
+            std::string to;
         };
 
-        void ParseRequests(const Document &doc, TransportCatalogue &catalogue, std::vector<StatRequests> &stat_requests, renderer::RenderSettings &rend_sett);
+        void ParseRequests(const Document &doc, TransportCatalogue &catalogue, std::vector<StatRequests> &stat_requests, renderer::RenderSettings &rend_sett, router::RouterSettings &rout_sett);
 
-        void ParseMap(const Dict &dictionary, TransportCatalogue &catalogue, std::vector<StatRequests> &stat_requests, renderer::RenderSettings &rend_sett);
+        void ParseMap(const Dict &dictionary, TransportCatalogue &catalogue, std::vector<StatRequests> &stat_requests, renderer::RenderSettings &rend_sett, router::RouterSettings &rout_sett);
 
         void ParseBaseRequest(const Node &node, TransportCatalogue &catalogue);
 
@@ -26,8 +28,10 @@ namespace catalogue
 
         void ParseRenderSettings(const Node &node, renderer::RenderSettings &rend_sett);
 
+        void ParseRouteSettings(const Node &node, router::RouterSettings &rout_sett);
+
         svg::Color ParseColor(const Node &node);
 
-        Document GetOutputDocument(TransportCatalogue &catalogue, std::vector<StatRequests> &stat_requests, renderer::RenderSettings &rend_sett);
+        Document GetOutputDocument(RequestHandler &request_handler, std::vector<StatRequests> &stat_requests);
     }
 }

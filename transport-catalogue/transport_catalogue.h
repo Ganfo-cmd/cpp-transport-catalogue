@@ -34,6 +34,8 @@ namespace catalogue
 
 		const std::deque<Stop> &GetStopList() const;
 
+		int GetStopCount() const;
+
 	private:
 		struct StopPtrHasher
 		{

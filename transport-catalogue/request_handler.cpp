@@ -5,8 +5,8 @@
 
 namespace catalogue
 {
-    RequestHandler::RequestHandler(const TransportCatalogue &db, const renderer::MapRenderer &renderer)
-        : db_(db), renderer_(renderer) {}
+    RequestHandler::RequestHandler(const TransportCatalogue &db, const renderer::MapRenderer &renderer, const router::TransportRouter &router)
+        : db_(db), renderer_(renderer), router_(router) {}
 
     svg::Document RequestHandler::RenderMap() const
     {
@@ -37,5 +37,30 @@ namespace catalogue
         }
 
         return result;
+    }
+
+    const Stop *RequestHandler::FindStop(std::string_view name) const
+    {
+        return db_.FindStop(name);
+    }
+
+    const std::unordered_set<const Bus *> &RequestHandler::GetStopInfo(std::string_view name) const
+    {
+        return db_.GetStopInfo(name);
+    }
+
+    BusInfo RequestHandler::GetBusInfo(std::string_view name) const
+    {
+        return db_.GetBusInfo(name);
+    }
+
+    const graph::DirectedWeightedGraph<double> &RequestHandler::GetGraph() const
+    {
+        return router_.GetGraph();
+    }
+
+    std::optional<RequestHandler::RouteInfo> RequestHandler::GetShortestRoute(const Stop *from, const Stop *to) const
+    {
+        return router_.GetShortestRoute(from, to);
     }
 }
