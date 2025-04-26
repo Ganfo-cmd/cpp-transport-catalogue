@@ -7,9 +7,11 @@ namespace catalogue
     namespace router
     {
 
-        TransportRouter::TransportRouter(RouterSettings &rout_sett, const TransportCatalogue &catalogue, size_t stop_count)
-            : wait_time_(rout_sett.wait_time), bus_velocity_(rout_sett.bus_velocity), graph_(stop_count * 2)
+        TransportRouter::TransportRouter(const RouterSettings &rout_sett, const TransportCatalogue &catalogue)
+            : wait_time_(rout_sett.wait_time), bus_velocity_(rout_sett.bus_velocity)
         {
+            const size_t vertex_count = catalogue.GetStopCount() * 2;
+            graph_ = graph::DirectedWeightedGraph<double>(vertex_count);
             BuildGraph(catalogue);
         }
 
@@ -30,11 +32,11 @@ namespace catalogue
                     {
                         to = vert_id_by_stop_.at(stops[j]);
                         distance += catalogue.GetDistance(stops[j - 1], stops[j]);
-                        graph_.AddEdge({from + 1, to, distance / (bus_velocity_ * (1000.0 / 60.0)), j - i, bus.bus_name});
+                        graph_.AddEdge({from + 1, to, distance / (bus_velocity_ * (METERS_PER_KILOMETER / MIN_PER_HOUR)), j - i, bus.bus_name});
                         if (!is_round)
                         {
-                            reverse_dist += catalogue.GetDistance(stops[j], stops[j -1]);
-                            graph_.AddEdge({to + 1, from, reverse_dist / (bus_velocity_ * (1000.0 / 60.0)), j - i, bus.bus_name});
+                            reverse_dist += catalogue.GetDistance(stops[j], stops[j - 1]);
+                            graph_.AddEdge({to + 1, from, reverse_dist / (bus_velocity_ * (METERS_PER_KILOMETER / MIN_PER_HOUR)), j - i, bus.bus_name});
                         }
                     }
                 }
@@ -43,14 +45,22 @@ namespace catalogue
             router_ = std::make_unique<graph::Router<double>>(graph_);
         }
 
-        const graph::DirectedWeightedGraph<double> &TransportRouter::GetGraph() const
-        {
-            return graph_;
-        }
-
         std::optional<TransportRouter::RouteInfo> TransportRouter::GetShortestRoute(const Stop *from, const Stop *to) const
         {
-            return router_->BuildRoute(vert_id_by_stop_.at(from), vert_id_by_stop_.at(to));
+            RouteInfo route_info;
+            const auto &short_route = router_->BuildRoute(vert_id_by_stop_.at(from), vert_id_by_stop_.at(to));
+
+            if (!short_route)
+            {
+                return std::nullopt;
+            }
+
+            for (const auto &edge_id : short_route->edges)
+            {
+                route_info.push_back(graph_.GetEdge(edge_id));
+            }
+
+            return route_info;
         }
 
         void TransportRouter::AddStops(const std::deque<Stop> &stops)

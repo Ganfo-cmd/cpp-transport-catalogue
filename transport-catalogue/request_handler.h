@@ -9,7 +9,7 @@ namespace catalogue
     class RequestHandler
     {
     public:
-        using RouteInfo = graph::Router<double>::RouteInfo;
+        using RouteInfo = router::TransportRouter::RouteInfo;
 
         RequestHandler(const TransportCatalogue &db, const renderer::MapRenderer &renderer, const router::TransportRouter &router);
 
@@ -20,8 +20,6 @@ namespace catalogue
         BusInfo GetBusInfo(std::string_view name) const;
 
         const std::unordered_set<const Bus *> &GetStopInfo(std::string_view name) const;
-
-        const graph::DirectedWeightedGraph<double>& GetGraph() const;
 
         std::optional<RouteInfo> GetShortestRoute(const Stop *from, const Stop *to) const;
 

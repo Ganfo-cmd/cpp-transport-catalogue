@@ -325,10 +325,9 @@ namespace catalogue
 
             json_builder.Key("items").StartArray();
             double total_time = 0.0;
-            for (const auto &edge_id : route_info->edges)
+            for (const auto &edge : route_info.value())
             {
                 json_builder.StartDict();
-                const auto &edge = request_handler.GetGraph().GetEdge(edge_id);
                 if (edge.span_count == 0)
                 {
                     json_builder

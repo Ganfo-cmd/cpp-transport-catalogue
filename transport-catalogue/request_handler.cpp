@@ -54,11 +54,6 @@ namespace catalogue
         return db_.GetBusInfo(name);
     }
 
-    const graph::DirectedWeightedGraph<double> &RequestHandler::GetGraph() const
-    {
-        return router_.GetGraph();
-    }
-
     std::optional<RequestHandler::RouteInfo> RequestHandler::GetShortestRoute(const Stop *from, const Stop *to) const
     {
         return router_.GetShortestRoute(from, to);

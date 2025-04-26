@@ -24,7 +24,7 @@ int main()
     ParseRequests(doc, catalogue, stat_requests, rend_sett, rout_sett);
 
     MapRenderer map_rend(rend_sett);
-    TransportRouter router(rout_sett, catalogue, catalogue.GetStopCount());
+    TransportRouter router(rout_sett, catalogue);
     RequestHandler request_handler(catalogue, map_rend, router);
     Document output = GetOutputDocument(request_handler, stat_requests);
     Print(output, std::cout);

@@ -19,13 +19,11 @@ namespace catalogue
         class TransportRouter
         {
         public:
-            using RouteInfo = graph::Router<double>::RouteInfo;
+            const double METERS_PER_KILOMETER = 1000.0;
+            const double MIN_PER_HOUR = 60.0;
+            using RouteInfo = std::vector<graph::Edge<double>>;
 
-            TransportRouter(RouterSettings &rout_sett, const TransportCatalogue &catalogue, size_t stop_count);
-
-            void BuildGraph(const TransportCatalogue &catalogue);
-
-            const graph::DirectedWeightedGraph<double> &GetGraph() const;
+            TransportRouter(const RouterSettings &rout_sett, const TransportCatalogue &catalogue);
 
             std::optional<RouteInfo> GetShortestRoute(const Stop *from, const Stop *to) const;
 
@@ -36,6 +34,8 @@ namespace catalogue
 
             graph::DirectedWeightedGraph<double> graph_;
             std::unique_ptr<graph::Router<double>> router_;
+
+            void BuildGraph(const TransportCatalogue &catalogue);
 
             void AddStops(const std::deque<Stop> &stops);
         };
